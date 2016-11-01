@@ -7,6 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import "AFNetworkReachabilityManager.h"
+
+
+#define APPDELEGATE ((AppDelegate *)[UIApplication sharedApplication].delegate)
 
 @interface AppDelegate ()
 
@@ -17,6 +21,30 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    
+    [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        
+        NSLog(@"Reachability changed: %@", AFStringFromNetworkReachabilityStatus(status));
+        
+        
+        switch (status) {
+            case AFNetworkReachabilityStatusReachableViaWWAN:
+            case AFNetworkReachabilityStatusReachableViaWiFi:
+                // -- Reachable -- //
+                NSLog(@"Reachable");
+                break;
+            case AFNetworkReachabilityStatusNotReachable:
+            default:
+                // -- Not reachable -- //
+                NSLog(@"Not Reachable");
+                break;
+        }
+        
+    }];
+    
     return YES;
 }
 
@@ -46,6 +74,43 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+
+- (void) shareWithSocialNetwork:(UIImage *)image  text:(NSString *)text
+{
+    
+    
+    text = text?:@"";
+    
+    
+    
+    
+    NSMutableArray *activities = [NSMutableArray array];
+    
+    
+    UIActivityViewController *activityController;
+    
+    if (image)
+        activityController = [[UIActivityViewController alloc] initWithActivityItems:@[image,text] applicationActivities:activities];
+    else
+        activityController = [[UIActivityViewController alloc] initWithActivityItems:@[text] applicationActivities:activities];
+    
+    activityController.excludedActivityTypes = @[UIActivityTypeAssignToContact, UIActivityTypeCopyToPasteboard, UIActivityTypePrint];
+    
+    
+    
+    [APPDELEGATE.window.rootViewController presentViewController:activityController animated:YES completion:^{
+        
+    }];
+    
+    
+}
+
+-(BOOL) isInternetReachable
+{
+    return [AFNetworkReachabilityManager sharedManager].reachable;
+}
+
 
 
 @end

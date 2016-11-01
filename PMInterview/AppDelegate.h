@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-
+- (void) shareWithSocialNetwork:(UIImage *)image text:(NSString *)text;
+-(BOOL) isInternetReachable;
 @end
 
